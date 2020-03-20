@@ -2,7 +2,9 @@ package com.corona.virus;
 
 import com.corona.virus.game.GameStatus;
 import com.corona.virus.game.PandemicGame;
+import com.corona.virus.game.Player;
 import net.dv8tion.jda.core.AccountType;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
@@ -12,41 +14,44 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import javax.security.auth.login.LoginException;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class PandemicBotMain extends ListenerAdapter {
 
-    public static final String TOKEN = "NjkwMjEyNzk1Mzk1ODY2NjM0.XnSqXQ.5xGaT34LrGEe2xH-hnUluIcwuSY";
+    public static final String TOKEN = "NjkwMjEyNzk1Mzk1ODY2NjM0.XnTw3g.Jefy6WcHI-nXFHzUF-5lO7h-Phk";
     public static final String START_PANDEMIC = "!startPandemic";
-    public static final String START_PANDEMIC_MESSAGE = "Pandemic is there. Users in this server will be coronned. Fear my almighty power!!!";
+    public static final String START_PANDEMIC_MESSAGE = "Pandemic is there. Users in this server will be coronned. Fear my almighty power!!! (To visualize the scores, you can use the !score command)";
     public static final String HEAL_MESSAGE = "!heal";
+    public static final String SCORE_MESSAGE = "!score";
+    public static final String PANDEMIC_CHANNEL = "général";
     public static final String CORONNED_MESSAGE = " is coronned. First player to heal him will increase his score. Use command !heal to do so.";
+    public static final String EFFECTIVE_HEAL_MESSAGE = "Effective heal performed. Scores: \n";
 
     private PandemicGame pandemicGame = new PandemicGame();
 
+    private static JDA jda;
+
     public static void main(String[] args) throws LoginException {
-        JDABuilder jdbaBuilder = new JDABuilder(AccountType.BOT);
-        jdbaBuilder.setToken(TOKEN);
-        jdbaBuilder.addEventListener(new PandemicBotMain());
-        jdbaBuilder.buildAsync();
+        JDABuilder jdbBuilder = new JDABuilder(AccountType.BOT);
+        jdbBuilder.setToken(TOKEN);
+        jdbBuilder.addEventListener(new PandemicBotMain());
+        jda = jdbBuilder.buildAsync();
     }
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         String inputMessage = event.getMessage().getContentRaw();
-        System.out.println(inputMessage + " / author : " + event.getAuthor().getId());
         if (event.getAuthor().isBot()){
             return;
         }
         else if(inputMessage.equals(START_PANDEMIC)){
-            System.out.println(event.getChannel());
-            System.out.println(event.getJDA().getUsers());
             startGameEvent(event.getChannel(), event.getJDA().getUsers());
         }
         else if(inputMessage.equals(HEAL_MESSAGE)){
             healPlayers(event);
         }
-        else{
-            gameLoop(event);
+        else if(inputMessage.equals(SCORE_MESSAGE)) {
+            event.getChannel().sendMessage(pandemicGame.getGameScores()).queue();
         }
     }
 
@@ -56,18 +61,36 @@ public class PandemicBotMain extends ListenerAdapter {
             channel.sendMessage(START_PANDEMIC_MESSAGE).queue();
             createPlayers(users);
             pandemicGame.setGameStatus(GameStatus.IN_PROGRESS);
+            Thread loopGame = new Thread(gameLoopThread);
+            loopGame.start();
         }
     }
 
     private void createPlayers(List<User> users){
-        users.forEach((user) -> pandemicGame.addPlayerInGame(user.getName()));
+        users.forEach((user) -> {
+            if (!user.isBot()) {
+                pandemicGame.addPlayerInGame(user.getName());
+            }
+        });
     }
 
-    private void gameLoop(MessageReceivedEvent event) {
+    private Runnable gameLoopThread = () -> {
+        while(true){
+            this.gameLoop();
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+    private void gameLoop() {
         if (pandemicGame.getGameStatus() == GameStatus.IN_PROGRESS){
-            User author = event.getAuthor();
-            if (pandemicGame.isUserCoronned(author.getName())){
-                event.getChannel().sendMessage(author.getName() + CORONNED_MESSAGE).queue();
+            List<Player> players = pandemicGame.getPlayers();
+            Player player = players.get(ThreadLocalRandom.current().nextInt(0, players.size()-1));
+            if (pandemicGame.isUserCoronned(player.getId())){
+                jda.getTextChannelsByName(PANDEMIC_CHANNEL, true).get(0).sendMessage(player.getId() + CORONNED_MESSAGE).queue();
             }
         }
     }
@@ -76,7 +99,10 @@ public class PandemicBotMain extends ListenerAdapter {
         if (pandemicGame.getGameStatus() == GameStatus.IN_PROGRESS){
             User author = event.getAuthor();
             pandemicGame.healPlayers(author.getName());
-            event.getChannel().sendMessage(pandemicGame.getGameScores()).queue();
+            if (pandemicGame.isHealAction()) {
+                event.getChannel().sendMessage(EFFECTIVE_HEAL_MESSAGE + pandemicGame.getGameScores()).queue();
+                pandemicGame.setHealAction(false);
+            }
         }
     }
 }

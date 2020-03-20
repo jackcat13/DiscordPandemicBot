@@ -38,9 +38,6 @@ public class Player {
 
     @Override
     public String toString() {
-        return "Player{" +
-                "id='" + id + '\'' +
-                ", score=" + score +
-                '}';
+        return "Nom : " + id + ", score=" + score + "\n";
     }
 }

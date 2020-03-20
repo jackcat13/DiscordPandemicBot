@@ -12,9 +12,12 @@ public class PandemicGame {
 
     private List<Player> players;
 
+    private boolean isHealAction;
+
     public PandemicGame(){
         gameStatus = GameStatus.STOPPED;
         players = new ArrayList<>();
+        isHealAction = false;
     }
 
     public GameStatus startGame(){
@@ -37,8 +40,8 @@ public class PandemicGame {
 
     public boolean isUserCoronned(String authorId) {
         Player currentPlayer = players.stream().filter(player -> player.getId().equals(authorId)).findFirst().get();
-        int randomNum = ThreadLocalRandom.current().nextInt(1, 3);
-        if (randomNum == 1){
+        int randomNum = ThreadLocalRandom.current().nextInt(1, 10);
+        if (randomNum == 1 && !currentPlayer.isCoronned()){
             currentPlayer.setCoronned(true);
             return true;
         }
@@ -56,6 +59,7 @@ public class PandemicGame {
         if (currentPlayer.isCoronned()){
             healerPlayer.setScore(healerPlayer.getScore()+1);
             currentPlayer.setCoronned(false);
+            isHealAction = true;
         }
     }
 
@@ -71,5 +75,17 @@ public class PandemicGame {
 
     public void setGameStatus(GameStatus gameStatus) {
         this.gameStatus = gameStatus;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public boolean isHealAction() {
+        return isHealAction;
+    }
+
+    public void setHealAction(boolean healAction) {
+        isHealAction = healAction;
     }
 }
