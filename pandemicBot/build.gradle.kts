@@ -58,6 +58,13 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-sleuth")
     implementation("io.opentracing.brave:brave-opentracing") { exclude(module = "brave-tests") }
     implementation("io.zipkin.brave:brave")
+    implementation("org.mongodb:mongodb-driver:3.12.7")
+    implementation("org.mongodb:mongodb-driver-core:3.12.7")
+    implementation("org.mongodb:bson:3.12.7")
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.data:spring-data-commons")
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")

@@ -10,6 +10,7 @@ class PandemicGame {
     private val players: MutableList<Player>
     var isHealAction: Boolean
 
+
     fun startGame(): GameStatus {
         gameStatus = if (gameStatus === GameStatus.STOPPED) {
             GameStatus.STARTED
@@ -21,9 +22,12 @@ class PandemicGame {
         return gameStatus
     }
 
-    fun addPlayerInGame(playerId: String) {
-        players.add(Player(playerId))
-        println(NEW_PLAYER_ADDED + playerId)
+    fun addPlayerInGame(playerId: String, playerName: String, playerScore: Int) {
+        var player = Player(playerId)
+        player.playerName = playerName
+        player.score = playerScore
+        players.add(player)
+        println(NEW_PLAYER_ADDED + playerName)
     }
 
     fun isUserCoronned(authorId: String): Boolean {
@@ -49,13 +53,6 @@ class PandemicGame {
             isHealAction = true
         }
     }
-
-    val gameScores: String
-        get() {
-            val scoresStringBuilder = StringBuilder()
-            players.forEach(Consumer { player: Player -> scoresStringBuilder.append(player.toString()) })
-            return scoresStringBuilder.toString()
-        }
 
     fun getPlayers(): List<Player> {
         return players

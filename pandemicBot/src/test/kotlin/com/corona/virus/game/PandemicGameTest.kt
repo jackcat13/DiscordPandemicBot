@@ -16,8 +16,8 @@ internal class PandemicGameTest {
     @Test
     fun `should add player in game`(){
         val expectedUser = "jackCat13"
-        pandemicGame.addPlayerInGame(expectedUser)
-        assertThat(pandemicGame.getPlayers().get(0).id).isEqualTo(expectedUser)
+        pandemicGame.addPlayerInGame("0", expectedUser, 0)
+        assertThat(pandemicGame.getPlayers().get(0).playerName).isEqualTo(expectedUser)
     }
 
     /*@Test
