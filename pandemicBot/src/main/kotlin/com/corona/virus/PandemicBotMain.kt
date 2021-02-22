@@ -10,6 +10,9 @@ import net.dv8tion.jda.api.entities.MessageChannel
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import net.dv8tion.jda.api.requests.GatewayIntent
+import net.dv8tion.jda.api.utils.ChunkingFilter
+import net.dv8tion.jda.api.utils.MemberCachePolicy
 import org.slf4j.LoggerFactory
 import java.awt.Color
 import java.lang.StringBuilder
@@ -35,6 +38,9 @@ class PandemicBotMain(private val pandemicSpringBootApplication: PandemicSpringB
     private val pandemicGame = PandemicGame()
     private var currentChannel: String? = null
     private val jda: JDA = JDABuilder.createDefault(TOKEN)
+        .setChunkingFilter(ChunkingFilter.ALL) // enable member chunking for all guilds
+        .setMemberCachePolicy(MemberCachePolicy.ALL) // ignored if chunking enabled
+        .enableIntents(GatewayIntent.GUILD_MEMBERS)
         .addEventListeners(this)
         .build()
     private val LOG = LoggerFactory.getLogger(PandemicBotMain::class.java)
