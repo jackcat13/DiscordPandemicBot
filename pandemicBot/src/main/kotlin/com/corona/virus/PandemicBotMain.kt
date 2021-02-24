@@ -67,6 +67,8 @@ class PandemicBotMain() : ListenerAdapter() {
                 }
                 savePlayer(player)
             }}
+        } else if (inputMessage.startsWith(""+botProperties.getMyScoreCommand())){
+            event.channel.sendMessage(getOnePlayerScore(event.message.author.id)).queue()
         }
     }
 
@@ -129,9 +131,10 @@ class PandemicBotMain() : ListenerAdapter() {
         if (pandemicGame.gameStatus === GameStatus.IN_PROGRESS) {
             val author = event.author
             pandemicGame.healPlayers(author.id)
+            val healerPlayer = pandemicGame.getPlayers().find { it.id == author.id }
             if (pandemicGame.isHealAction) {
                 //Save game at each step to avoid losses in case of crash
-                pandemicGame.getPlayers().forEach { savePlayer(it) }
+                savePlayer(healerPlayer!!)
                 event.channel.sendMessage(""+botProperties.getEffectiveHealMessage()).queue()
                 event.channel.sendMessage(getScoresOrdered()).queue()
                 pandemicGame.isHealAction = false
@@ -148,6 +151,19 @@ class PandemicBotMain() : ListenerAdapter() {
         embedBuilder.setImage(botProperties.getDiscoRaoultGifUrl())
         embedBuilder.setThumbnail(botProperties.getPandemicBotLogoUrl())
         getPlayersOrderedByScores().forEachIndexed{ index, element ->  embedBuilder.addField("" + (index+1), element.toString(), false) }
+        return embedBuilder.build()
+    }
+
+    private fun getOnePlayerScore(authorId: String): MessageEmbed {
+        var embedBuilder = EmbedBuilder()
+        embedBuilder.setTitle(botProperties.getScoreTitle(), null)
+        embedBuilder.setColor(Color.GREEN)
+        embedBuilder.setDescription(botProperties.getOnePlayerScoreDescriptionMessage())
+        embedBuilder.addBlankField(false)
+        embedBuilder.setImage(botProperties.getDiscoRaoultGifUrl())
+        embedBuilder.setThumbnail(botProperties.getPandemicBotLogoUrl())
+        val currentPlayer = getPlayers().find{it.id == authorId}
+        embedBuilder.addField("" + (1), currentPlayer.toString(), false)
         return embedBuilder.build()
     }
 
