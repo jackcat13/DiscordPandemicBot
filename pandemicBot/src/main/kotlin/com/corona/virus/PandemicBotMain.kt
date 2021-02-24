@@ -20,6 +20,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.awt.Color
 import java.util.concurrent.ThreadLocalRandom
+import net.dv8tion.jda.api.entities.TextChannel
+
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
+
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.event
+
+
+
 
 
 val TOKEN = System.getenv("PANDEMIC_TOKEN")
@@ -70,6 +78,15 @@ class PandemicBotMain() : ListenerAdapter() {
         } else if (inputMessage.startsWith(""+botProperties.getMyScoreCommand())){
             event.channel.sendMessage(getOnePlayerScore(event.message.author.id)).queue()
         }
+    }
+
+    override fun onGuildMemberJoin(event: GuildMemberJoinEvent) {
+        val user = event.member
+        val player = Player(user.id)
+        player.playerName = user.effectiveName
+        savePlayer(player)
+        if (pandemicGame.gameStatus != GameStatus.STOPPED) pandemicGame.addPlayerInGame(player.id, player.playerName, 0)
+        LOG.debug("New player {} joined the server, hence he has been automatically been save in DB as a new player", player.playerName)
     }
 
     private fun addUser(inputMessage: String, event: MessageReceivedEvent){
