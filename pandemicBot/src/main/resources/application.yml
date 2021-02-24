@@ -1,3 +1,28 @@
 logging:
   level:
     com.corona.virus.*: DEBUG
+
+bot:
+  commands:
+    startPandemic: "!startPandemic"
+    score: "!score"
+    addUser: "!addUser"
+    heal: "!heal"
+    getUsers: "!getUsers"
+    loadUsersFromServer: "!loadUsersFromServer"
+  messages:
+    startPandemic: "Pandemic is there. Users in this server will be coronned. Fear my almighty power!!! (To visualize the scores, you can use the !score command)"
+    boldMarkdown: "**"
+    coronnedTitle: "Corroned"
+    coronned: " is coronned.** First player to heal him will increase his score. Use command **!heal** to do so."
+    effectiveHeal: "Chloroquine heal is super effective. Scores: \n"
+    loadUsersFromServer: "Received message starting loading all users from server to DB"
+    createUser: "Received message to create user {}"
+    virusAttackTitle: "Virus attack"
+    playerCoronned: "A player has been coronned"
+    scoreTitle: "Scores #Chloroquine"
+    scoreDescription: "Top 10 scores oredered desc"
+  imagesUrl:
+    pandemicPoutine: "https://cdn.discordapp.com/attachments/799359211178819624/812140501901901824/gif-poutine-pandemic-bot.gif"
+    pandemicBotLogo: "https://cdn.discordapp.com/emojis/809604534078799882.png?v=1"
+    discoRaoult: "https://cdn.discordapp.com/attachments/799359211178819624/812164915124109312/gif-raoult-et-pangolin_v2.gif"
