@@ -1,14 +1,15 @@
 package com.corona.virus.game
 
+import org.springframework.stereotype.Component
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
-import java.util.function.Consumer
 
+@Component
 class PandemicGame {
 
-    var gameStatus: GameStatus
-    private val players: MutableList<Player>
-    var isHealAction: Boolean
+    var gameStatus = GameStatus.STOPPED
+    private val players = ArrayList<Player>()
+    var isHealAction = false
 
 
     fun startGame(): GameStatus {
@@ -27,7 +28,6 @@ class PandemicGame {
         player.playerName = playerName
         player.score = playerScore
         players.add(player)
-        println(NEW_PLAYER_ADDED + playerName)
     }
 
     fun isUserCoronned(authorId: String): Boolean {
@@ -42,7 +42,7 @@ class PandemicGame {
     }
 
     fun healPlayers(authorId: String) {
-        players.forEach(Consumer { player: Player -> healPlayer(player, authorId) })
+        players.forEach{ healPlayer(it, authorId) }
     }
 
     private fun healPlayer(currentPlayer: Player, authorId: String) {
@@ -54,17 +54,5 @@ class PandemicGame {
         }
     }
 
-    fun getPlayers(): List<Player> {
-        return players
-    }
-
-    companion object {
-        const val NEW_PLAYER_ADDED = "New player added"
-    }
-
-    init {
-        gameStatus = GameStatus.STOPPED
-        players = ArrayList()
-        isHealAction = false
-    }
+    fun getPlayers() =  players
 }

@@ -1,6 +1,6 @@
 package com.corona.virus.service
 
-import com.corona.virus.game.repositories.PlayerRepository
+import com.corona.virus.repositories.PlayerRepository
 import com.corona.virus.game.Player
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired

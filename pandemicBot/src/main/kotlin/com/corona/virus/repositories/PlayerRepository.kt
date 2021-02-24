@@ -1,4 +1,4 @@
-package com.corona.virus.game.repositories
+package com.corona.virus.repositories
 
 import com.corona.virus.game.Player
 import org.springframework.data.mongodb.repository.MongoRepository
