@@ -3,6 +3,7 @@ logging:
     com.corona.virus.*: DEBUG
 
 bot:
+  language: "fr"
   commands:
     startPandemic: "!startPandemic"
     score: "!score"
@@ -10,18 +11,34 @@ bot:
     heal: "!heal"
     getUsers: "!getUsers"
     loadUsersFromServer: "!loadUsersFromServer"
+    myScore: "!myScore"
   messages:
-    startPandemic: "Pandemic is there. Users in this server will be coronned. Fear my almighty power!!! (To visualize the scores, you can use the !score command)"
-    boldMarkdown: "**"
-    coronnedTitle: "Corroned"
-    coronned: " is coronned.** First player to heal him will increase his score. Use command **!heal** to do so."
-    effectiveHeal: "Chloroquine heal is super effective. Scores: \n"
-    loadUsersFromServer: "Received message starting loading all users from server to DB"
-    createUser: "Received message to create user {}"
-    virusAttackTitle: "Virus attack"
-    playerCoronned: "A player has been coronned"
-    scoreTitle: "Scores #Chloroquine"
-    scoreDescription: "Top 10 scores oredered desc"
+    en:
+      startPandemic: "Pandemic is there. Users in this server will be coronned. Fear my almighty power!!! (To visualize the scores, you can use the !score command)"
+      boldMarkdown: "**"
+      coronnedTitle: "Corroned"
+      coronned: " is coronned.** First player to heal him will increase his score. Use command **!heal** to do so."
+      effectiveHeal: "Chloroquine heal is super effective. Scores: \n"
+      loadUsersFromServer: "Received message starting loading all users from server to DB"
+      createUser: "Received message to create user {}"
+      virusAttackTitle: "Virus attack"
+      playerCoronned: "A player has been coronned"
+      scoreTitle: "Scores #Chloroquine"
+      scoreDescription: "Top 10 scores oredered desc"
+      onePlayerScoreDescription: "Your score"
+    fr:
+      startPandemic: "La pandémie est arrivée. Les joueurs de ce serveur vont être coronned. Craignez ma toute puissance!!! (Pour visualiser les scores, vous pouvez utiliser la commande !score)"
+      boldMarkdown: "**"
+      coronnedTitle: "Corroned"
+      coronned: " est coronned.** Le premier joueur à heal augmentera son score. Utilisez la commande **!heal** pour le faire."
+      effectiveHeal: "Le soin à la Chloroquine est super efficace! Scores: \n"
+      loadUsersFromServer: "A reçu message de chargement de tous les utilisateur du serveur vers la DB"
+      createUser: "A reçu message de création de l'utilisateur {}"
+      virusAttackTitle: "Attaque du virus!"
+      playerCoronned: "Un joueur a été coronned"
+      scoreTitle: "Scores #Chloroquine"
+      scoreDescription: "Top 10 scores par ordre décroissant"
+      onePlayerScoreDescription: "Ton score"
   imagesUrl:
     pandemicPoutine: "https://cdn.discordapp.com/attachments/799359211178819624/812140501901901824/gif-poutine-pandemic-bot.gif"
     pandemicBotLogo: "https://cdn.discordapp.com/emojis/809604534078799882.png?v=1"
