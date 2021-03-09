@@ -13,11 +13,10 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.awt.Color
-import java.lang.IllegalArgumentException
 import java.util.concurrent.ThreadLocalRandom
 
 @Component
-class PandemicBotController() {
+class PandemicBotController {
 
     @Autowired private lateinit var botProperties: PandemicBotProperties
     @Autowired private lateinit var playerController: PlayerController
@@ -83,7 +82,7 @@ class PandemicBotController() {
             val player = players[ThreadLocalRandom.current().nextInt(players.size)]
             if (pandemicGame.isUserCoronned(player.id)) {
                 embedBuilder.addField(""+botProperties.getCoronnedTitle(), botProperties.getBoldMarkdown() + player.playerName + botProperties.getCoronnedMessage(), false)
-                jda.getTextChannelsByName(currentChannel!!, true)[0].sendMessage(embedBuilder.build()).queue()
+                jda.getTextChannelsByName(currentChannel, true)[0].sendMessage(embedBuilder.build()).queue()
             }
         }
     }
@@ -96,9 +95,12 @@ class PandemicBotController() {
             if (pandemicGame.isHealAction) {
                 //Save game at each step to avoid losses in case of crash
                 playerController.savePlayer(healerPlayer!!)
+                pandemicGame.healMessagesHistory[event.author.id] = Pair(event.message.timeCreated, true)
                 event.channel.sendMessage(""+botProperties.getEffectiveHealMessage()).queue()
                 event.channel.sendMessage(getScoresOrdered()).queue()
                 pandemicGame.isHealAction = false
+            } else{
+                pandemicGame.healMessagesHistory[event.author.id] = Pair(event.message.timeCreated, false)
             }
         }
     }
@@ -145,6 +147,29 @@ class PandemicBotController() {
             }
             playerController.savePlayer(player)
         }}
+    }
+
+    fun chehCommand(event: MessageReceivedEvent){
+        if (pandemicGame.healMessagesHistory.isNotEmpty()) {
+            val authorId = event.message.author.id
+            val healMessageHistoryEntries = pandemicGame.healMessagesHistory.entries
+            val lastHealMessage = healMessageHistoryEntries.last()
+            val beforeLastHealMessage = healMessageHistoryEntries.elementAt(healMessageHistoryEntries.size - 2)
+            val matchedLastEntry = healMessageHistoryEntries.find {
+                it.key == authorId && it.value.second
+            }
+            if (lastHealMessage == matchedLastEntry || beforeLastHealMessage == matchedLastEntry) {
+                if (pandemicGame.isChehCommandEffective(event, authorId)) {
+                    pandemicGame.processCheh(authorId)
+                    val cheherPlayer = pandemicGame.getPlayers().find { it.id == authorId }
+                    //Save game at each step to avoid losses in case of crash
+                    playerController.savePlayer(cheherPlayer!!)
+                    event.channel.sendMessage("" + botProperties.getEffectiveChehMessage()).queue()
+                    event.channel.sendMessage(getScoresOrdered()).queue()
+                    pandemicGame.healMessagesHistory.clear()
+                }
+            }
+        }
     }
 
 }
