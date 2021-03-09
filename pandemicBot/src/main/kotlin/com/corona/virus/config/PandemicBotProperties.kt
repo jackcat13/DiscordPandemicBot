@@ -23,6 +23,7 @@ class PandemicBotProperties {
     fun getGetUsersCommand() = env.getProperty("bot.commands.getUsers")
     fun getLoadUsersFromServerCommand() = env.getProperty("bot.commands.loadUsersFromServer")
     fun getMyScoreCommand() = env.getProperty("bot.commands.myScore")
+    fun getChehCommand() = env.getProperty("bot.commands.cheh")
 
     //Messages
     fun getStartPandemicMessage() = env.getProperty("bot.messages.${getLanguage()}.startPandemic")
@@ -37,10 +38,10 @@ class PandemicBotProperties {
     fun getScoreTitle() = env.getProperty("bot.messages.${getLanguage()}.scoreTitle")
     fun getScoreDescriptionMessage() = env.getProperty("bot.messages.${getLanguage()}.scoreDescription")
     fun getOnePlayerScoreDescriptionMessage() = env.getProperty("bot.messages.${getLanguage()}.onePlayerScoreDescription")
+    fun getEffectiveChehMessage() = env.getProperty("bot.messages.${getLanguage()}.effectiveCheh")
 
     //Images URLs
     fun getPandemicPoutineGifUrl() = env.getProperty("bot.imagesUrl.pandemicPoutine")
     fun getPandemicBotLogoUrl() = env.getProperty("bot.imagesUrl.pandemicBotLogo")
     fun getDiscoRaoultGifUrl() = env.getProperty("bot.imagesUrl.discoRaoult")
-    
 }

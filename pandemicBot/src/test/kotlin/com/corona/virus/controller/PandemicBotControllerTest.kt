@@ -7,7 +7,6 @@ import com.corona.virus.game.Player
 import io.mockk.*
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
-import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.MessageChannel
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.User
@@ -17,6 +16,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.time.OffsetDateTime
 
 internal class PandemicBotControllerTest {
 
@@ -40,11 +40,13 @@ internal class PandemicBotControllerTest {
         every { botProperties.getVirusAttackTitle() } returns "OSEF"
         every { botProperties.getPlayerCoronnedMessage() } returns "OSEF"
         every { botProperties.getEffectiveHealMessage() } returns "OSEF"
+        every { botProperties.getEffectiveChehMessage() } returns "OSEF"
         every { botProperties.getScoreTitle() } returns "OSEF"
         every { botProperties.getScoreDescriptionMessage() } returns "OSEF"
         every { botProperties.getDiscoRaoultGifUrl() } returns "http://osef.osef"
         every { botProperties.getPandemicBotLogoUrl() } returns "http://osef.osef"
         every { playerController.savePlayer(any()) } just Runs
+        every { playerController.getPlayersOrderedByScores() } returns ArrayList()
     }
 
     @Test
@@ -110,7 +112,44 @@ internal class PandemicBotControllerTest {
         every { event.channel.sendMessage("OSEF").queue() } just Runs
         every { playerController.getPlayersOrderedByScores() } returns ArrayList()
         every { event.channel.sendMessage(any<MessageEmbed>()).queue() } just Runs
+        every { event.message.timeCreated } returns OffsetDateTime.now()
         pandemicBotController.healPlayers(event)
         assertThat(pandemicBotController.pandemicGame.getPlayers()[0].isCoronned).isFalse
+    }
+
+    @Test
+    fun `should give additional points when effective cheh is performed`(){
+        pandemicBotController.pandemicGame.gameStatus = GameStatus.IN_PROGRESS
+        val event = mockk< MessageReceivedEvent>()
+        val playerOne = Player("123")
+        val playerTwo = Player("456")
+        pandemicBotController.pandemicGame.getPlayers().add(playerOne)
+        pandemicBotController.pandemicGame.getPlayers().add(playerTwo)
+        pandemicBotController.pandemicGame.healMessagesHistory["123"] = Pair(OffsetDateTime.now(), true)
+        pandemicBotController.pandemicGame.healMessagesHistory["456"] = Pair(OffsetDateTime.now(), false)
+        every { event.message.author.id } returns "123"
+        every { event.channel.sendMessage(any<MessageEmbed>()).queue() } just Runs
+        every { event.channel.sendMessage("OSEF").queue() } just Runs
+        pandemicBotController.chehCommand(event)
+        assertThat(playerOne.score).isEqualTo(2)
+        assertThat(pandemicBotController.pandemicGame.healMessagesHistory.isEmpty()).isTrue
+    }
+
+    @Test
+    fun `should not give additional points when no effective cheh is performed`(){
+        pandemicBotController.pandemicGame.gameStatus = GameStatus.IN_PROGRESS
+        val event = mockk< MessageReceivedEvent>()
+        val playerOne = Player("123")
+        val playerTwo = Player("456")
+        pandemicBotController.pandemicGame.getPlayers().add(playerOne)
+        pandemicBotController.pandemicGame.getPlayers().add(playerTwo)
+        pandemicBotController.pandemicGame.healMessagesHistory["123"] = Pair(OffsetDateTime.now(), false)
+        pandemicBotController.pandemicGame.healMessagesHistory["456"] = Pair(OffsetDateTime.now(), false)
+        every { event.message.author.id } returns "123"
+        every { event.channel.sendMessage(any<MessageEmbed>()).queue() } just Runs
+        every { event.channel.sendMessage("OSEF").queue() } just Runs
+        pandemicBotController.chehCommand(event)
+        assertThat(playerOne.score).isEqualTo(0)
+        assertThat(pandemicBotController.pandemicGame.healMessagesHistory.isEmpty()).isTrue
     }
 }

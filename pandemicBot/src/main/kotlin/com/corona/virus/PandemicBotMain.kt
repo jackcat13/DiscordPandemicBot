@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import javax.annotation.PostConstruct
 
 val TOKEN = System.getenv("PANDEMIC_TOKEN")
 
@@ -35,30 +36,43 @@ class PandemicBotMain() : ListenerAdapter() {
         .build()
     private val LOG = LoggerFactory.getLogger(PandemicBotMain::class.java)
 
-    init{
+    @PostConstruct
+    fun init(){
         pandemicBotController.pandemicGame = pandemicGame
         pandemicBotController.jda = jda
     }
 
     override fun onMessageReceived(event: MessageReceivedEvent) {
         val inputMessage = event.message.contentRaw
-        if (event.author.isBot) {
-            return
-        } else if (inputMessage == botProperties.getStartPandemicCommand()) {
-            pandemicBotController.currentChannel = event.channel.name
-            pandemicBotController.startGameEvent(event.channel, playerController.getPlayers())
-        } else if (inputMessage == botProperties.getHealCommand()) {
-            pandemicBotController.healPlayers(event)
-        } else if (inputMessage == botProperties.getScoreCommand()) {
-            event.channel.sendMessage(pandemicBotController.getScoresOrdered()).queue()
-        } else if (inputMessage.startsWith(""+botProperties.getAddUserCommand())) {
-            pandemicBotController.addUser(inputMessage)
-        } else if (inputMessage == botProperties.getGetUsersCommand()) {
-            event.message.channel.sendMessage(pandemicBotController.getUsers().toString()).queue()
-        } else if (inputMessage == botProperties.getLoadUsersFromServerCommand()) {
-            pandemicBotController.loadUsersFromServer()
-        } else if (inputMessage.startsWith(""+botProperties.getMyScoreCommand())){
-            event.channel.sendMessage(pandemicBotController.getOnePlayerScore(event.message.author.id)).queue()
+        when {
+            event.author.isBot -> {
+                return
+            }
+            inputMessage == botProperties.getStartPandemicCommand() -> {
+                pandemicBotController.currentChannel = event.channel.name
+                pandemicBotController.startGameEvent(event.channel, playerController.getPlayers())
+            }
+            inputMessage == botProperties.getHealCommand() -> {
+                pandemicBotController.healPlayers(event)
+            }
+            inputMessage == botProperties.getScoreCommand() -> {
+                event.channel.sendMessage(pandemicBotController.getScoresOrdered()).queue()
+            }
+            inputMessage.startsWith(""+botProperties.getAddUserCommand()) -> {
+                pandemicBotController.addUser(inputMessage)
+            }
+            inputMessage == botProperties.getGetUsersCommand() -> {
+                event.message.channel.sendMessage(pandemicBotController.getUsers().toString()).queue()
+            }
+            inputMessage == botProperties.getLoadUsersFromServerCommand() -> {
+                pandemicBotController.loadUsersFromServer()
+            }
+            inputMessage.startsWith(""+botProperties.getMyScoreCommand()) -> {
+                event.channel.sendMessage(pandemicBotController.getOnePlayerScore(event.message.author.id)).queue()
+            }
+            inputMessage == botProperties.getChehCommand() -> {
+                pandemicBotController.chehCommand(event)
+            }
         }
     }
 
