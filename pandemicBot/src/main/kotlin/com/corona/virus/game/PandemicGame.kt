@@ -1,8 +1,10 @@
 package com.corona.virus.game
 
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import org.springframework.stereotype.Component
-import java.util.*
+import java.time.OffsetDateTime
 import java.util.concurrent.ThreadLocalRandom
+import kotlin.math.absoluteValue
 
 @Component
 class PandemicGame {
@@ -10,7 +12,7 @@ class PandemicGame {
     var gameStatus = GameStatus.STOPPED
     private val players = ArrayList<Player>()
     var isHealAction = false
-
+    var healMessagesHistory = LinkedHashMap<String, Pair<OffsetDateTime, Boolean>>()
 
     fun startGame(): GameStatus {
         gameStatus = if (gameStatus === GameStatus.STOPPED) {
@@ -46,13 +48,31 @@ class PandemicGame {
     }
 
     private fun healPlayer(currentPlayer: Player, authorId: String) {
-        val healerPlayer = players.stream().filter { player: Player -> player.id == authorId }.findFirst().get()
+        val healerPlayer = players.stream().filter { it.id == authorId }.findFirst().get()
         if (currentPlayer.isCoronned) {
-            healerPlayer.score = healerPlayer.score + 1
+            healerPlayer.score++
             currentPlayer.isCoronned = false
             isHealAction = true
         }
     }
 
     fun getPlayers() =  players
+
+    fun isChehCommandEffective(event: MessageReceivedEvent, authorId: String): Boolean {
+        val healMessageHistoryEntries = healMessagesHistory.entries
+        val lastHealAuthor = healMessageHistoryEntries.last().key
+        val beforeLastHealAuthor = healMessageHistoryEntries.elementAt(healMessageHistoryEntries.size-2).key
+        val lastHealMessageEffective = healMessageHistoryEntries.last().value.second
+        val beforeLastHealMessageEffective = healMessageHistoryEntries.elementAt(healMessageHistoryEntries.size-2).value.second
+        return (lastHealAuthor != beforeLastHealAuthor) &&
+            ( (!lastHealMessageEffective && beforeLastHealMessageEffective) ||
+            (lastHealMessageEffective && !beforeLastHealMessageEffective) )
+    }
+
+    fun processCheh(authorId: String) {
+        val cheherPlayer = players.stream().filter { it.id == authorId }.findFirst().get()
+        cheherPlayer.score+=2
+    }
+
+
 }

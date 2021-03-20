@@ -22,6 +22,7 @@ plugins {
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
     id("org.springframework.boot") version "2.4.2"
+    jacoco
 }
 apply {
     plugin("io.spring.dependency-management")
